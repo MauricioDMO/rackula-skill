@@ -1,0 +1,9 @@
+{
+  "name": "rackula-skill",
+  "type": "module",
+  "private": true,
+  "packageManager": "pnpm@10.33.2",
+  "scripts": {
+    "zip-yaml": "node ./scripts/zip-yaml.js"
+  }
+}
