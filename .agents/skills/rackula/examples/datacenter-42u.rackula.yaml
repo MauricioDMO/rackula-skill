@@ -19,27 +19,27 @@ racks:
         device_type: ups-2u
         name: UPS Primary
         position: 6
-        face: front
+        face: both
       - id: dev-pdu-01
         device_type: pdu
         name: PDU A
         position: 18
-        face: front
+        face: both
       - id: dev-server-01
         device_type: dell-r650
         name: Web Server 1
         position: 24
-        face: front
+        face: both
       - id: dev-server-02
         device_type: dell-r650
         name: Web Server 2
         position: 30
-        face: front
+        face: both
       - id: dev-switch-01
         device_type: switch-48-port
         name: Core Switch
         position: 36
-        face: front
+        face: both
 device_types:
   - slug: dell-r650
     manufacturer: Dell

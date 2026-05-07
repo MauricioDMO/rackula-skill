@@ -1,0 +1,55 @@
+metadata:
+  id: 11111111-2222-4333-8444-555555555555
+  name: Eval Existing Layout
+  schema_version: "1.0"
+version: 1.0.0
+name: Eval Existing Layout
+racks:
+  - id: rack-main
+    name: Main Rack
+    height: 42
+    width: 19
+    desc_units: false
+    show_rear: true
+    form_factor: 4-post-cabinet
+    starting_unit: 1
+    position: 0
+    notes: Existing rack notes
+    devices:
+      - id: existing-server-1
+        device_type: generic-1u-server
+        name: Existing Server 1
+        position: 6
+        face: both
+        slot_position: full
+      - id: existing-switch-1
+        device_type: generic-1u-switch
+        name: Existing Switch 1
+        position: 18
+        face: both
+        slot_position: full
+device_types:
+  - slug: generic-1u-server
+    model: Generic 1U Server
+    u_height: 1
+    slot_width: 2
+    is_full_depth: true
+    airflow: front-to-rear
+    colour: "#4A7A8A"
+    category: server
+  - slug: generic-1u-switch
+    model: Generic 1U Switch
+    u_height: 1
+    slot_width: 2
+    is_full_depth: true
+    airflow: front-to-rear
+    colour: "#7B6BA8"
+    category: network
+    interfaces:
+      - name: Port 1
+        type: 1000base-t
+      - name: Port 2
+        type: 1000base-t
+settings:
+  display_mode: label
+  show_labels_on_images: false

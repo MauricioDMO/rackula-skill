@@ -33,7 +33,7 @@
       "id": 2,
       "prompt": "Add a new blade chassis to my-layout.rackula.yaml - put a 4U blade chassis at position 120 with 4 device bays. Then add 2 blade servers inside it at Bay 1 and Bay 2 with names 'Production Blade 1' and 'Production Blade 2'. The chassis should have colour #8BE9FD and category chassis, the blades should have colour #BD93F9.",
       "expected_output": "Modified YAML with parent/child device relationship properly configured using container_id/slot_id model",
-      "files": ["my-layout.rackula.yaml"],
+      "files": ["evals/files/my-layout.rackula.yaml"],
       "expectations": [
         "Uses modern top-level racks array",
         "Adds a 4U blade chassis device type with slots array and category chassis",
@@ -59,7 +59,7 @@
       "id": 4,
       "prompt": "I have a rackula file called my-layout.rackula.yaml. Change the display_mode to 'image-label' and set show_labels_on_images to true. Also add a custom_field called 'department' with value 'infrastructure' to the rack's notes or metadata.",
       "expected_output": "Modified settings section with display_mode change and custom_fields added",
-      "files": ["my-layout.rackula.yaml"],
+      "files": ["evals/files/my-layout.rackula.yaml"],
       "expectations": [
         "Sets settings.display_mode to image-label",
         "Sets settings.show_labels_on_images to true",

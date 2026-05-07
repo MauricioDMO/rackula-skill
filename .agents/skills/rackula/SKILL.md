@@ -6,35 +6,66 @@ description: |
 
 # Rackula Skill
 
-Rackula is an open-source rack layout designer. This skill creates, edits, validates, and documents Rackula YAML layouts.
+Rackula is an open-source rack layout designer. This skill helps create, edit, validate, package, and explain Rackula YAML layouts.
 
-## Workflow
+## First Decision
 
-When a user asks for an importable Rackula artifact in a workspace with `input/` and `zip-yaml`:
+Classify the user's request before writing YAML:
 
-1. **Create YAML** in `input/*.rackula.yaml` with `metadata.id` (UUID) and `metadata.name`
-2. **Build** the packager: `pnpm run build`
-3. **Package** the YAML: `pnpm run zip-yaml -- --input ./input --output ./output`
-4. **Report** both YAML path and ZIP path for import at `https://count.racku.la/`
+1. **Create** a new Rackula layout.
+2. **Edit** an existing `.rackula.yaml` file.
+3. **Validate/debug** YAML or a failed import.
+4. **Package** YAML into an importable `.Rackula.zip`.
+5. **Explain/document** a rack architecture.
 
-## Key Rules
+This classification matters because each path needs different context. Do not load every reference file by default; load the smallest set that matches the task.
 
-- Use `racks: [...]` (plural). The singular `rack:` is legacy input only — never emit it in new files.
-- Modern positions use internal 1/6U units where `6 units = 1U`. See `references/position-system.md`.
-- Use `container_id`/`slot_id` for blade/container devices. See `references/container-blade.md`.
-- For rack-mounted servers, storage, UPS, firewalls, and other full-depth devices that should appear from the rear, set the YAML `face: both` (Rackula mounted face = both). Use `face: front` only for truly front-only/passive items such as patch panels or front-only blanks.
-- Fill unused rack units with explicit blank devices, not visual gaps. Blank device types must use `category: blank` and a gray `#RRGGBB` color, preferably `#44475A`.
-- Quote `device_bays[].position` as a string — it's a string in the current schema.
-- Do not use `management` as an interface type.
-- Use `#RRGGBB` colors only — not `#FFF`, named colors, or `rgb(...)`.
+## Operating Workflow
 
-## Rack Layout Architecture Rules
+Follow this sequence for Rackula work:
 
-When generating datacenter rack diagrams, do not place equipment only by visual symmetry or available space. Always reason through the physical, electrical, thermal, operational, and cabling constraints before assigning rack units.
+1. **Inspect inputs and workspace.** Check whether the user provided a file, whether `input/` and `output/` exist, and whether an existing `.rackula.yaml` must be preserved.
+2. **Load task-specific context.** Use the reference map below to read only the schema, examples, or architecture guidance needed for the task.
+3. **Model the physical rack before YAML.** Decide rack size, rack type, heavy-device placement, power assumptions, airflow, cabling path, maintenance access, and expansion space.
+4. **Define device types first.** Every placed `device_type` slug must exist in `device_types`; keep slugs unique and valid kebab-case.
+5. **Place devices with internal positions.** Convert human U positions to Rackula internal units where `position = U * 6`; U1 is the bottom of the rack.
+6. **Apply physical architecture rules.** Heavy gear low, UPS/batteries at the bottom, switches near cabling, KVM consoles at ergonomic height, explicit blanks for unused rack units when producing a complete diagram.
+7. **Validate before final output.** Check schema shape, positions, fit, collisions, `face`, device type references, colors, enum values, and port references.
+8. **Package when requested.** If the user wants an importable artifact, build and run `zip-yaml`, then report both YAML and ZIP paths.
 
-### Core reasoning order
+## Context Loading Guide
 
-Before producing a rack layout, apply this order of reasoning:
+| User task | Read these files |
+|-----------|------------------|
+| New basic layout | `references/schema.md`, `references/position-system.md`, `references/device-types.md` |
+| Existing YAML edit | `references/schema.md`, then preserve unknown fields in the target file |
+| Rack placement/architecture | `references/rack-layout-architecture.md` |
+| Homelab or small rack | `examples/homelab-small.rackula.yaml`, `examples/homelab-router-switch.rackula.yaml` |
+| Datacenter rack | `examples/datacenter-42u.rackula.yaml`, `references/rack-layout-architecture.md` |
+| Blade chassis/container devices | `references/container-blade.md` |
+| Multi-rack rows or port links | `references/connections.md` |
+| Enum or type uncertainty | `references/enums.md`, `references/device-types.md` |
+| Collision or fit problems | `references/collision.md`, `references/position-system.md` |
+| Import/package error | `references/troubleshooting.md`, `docs/TROUBLESHOOTING.md` if available |
+
+## Required YAML Rules
+
+- Use `racks: [...]` for new files. The singular `rack:` key is legacy input only.
+- Include `metadata.name` when creating files that will be packaged.
+- Use top-level order: `metadata`, `version`, `name`, `racks`, `device_types`, `settings`, then optional `rack_groups`, `connections`.
+- Define every `device_types[].slug` referenced by rack devices.
+- Use internal positions: U1 = `position: 6`, U25 = `position: 150`, U42 = `position: 252`.
+- Do not use `position: 0` for rack-level devices; `0` is valid only for container children.
+- Use `face: both` for full-depth rack-mounted servers, storage, UPS, firewalls, and other rear-visible devices. Use `face: front` for front-only/passive items like patch panels or front-only blanks.
+- Fill unused rack units with explicit blank devices when creating a complete diagram; blank device types use `category: blank` and a gray `#RRGGBB` color, preferably `#44475A`.
+- Use `#RRGGBB` colors only.
+- Do not use `management` as an interface type; use `1000base-t`, `10gbase-x-sfpp`, `console`, `virtual`, or `other` as appropriate.
+- Quote `device_bays[].position` values if working with legacy device bays.
+- Prefer `connections` over deprecated `cables` for port-to-port links.
+
+## Rack Architecture Reasoning
+
+Before placing equipment, reason in this order:
 
 1. Mechanical safety and weight distribution.
 2. Power architecture and redundancy.
@@ -44,515 +75,81 @@ Before producing a rack layout, apply this order of reasoning:
 6. Logical grouping and failure-domain separation.
 7. Expansion space and documentation clarity.
 
-A rack layout is invalid if it looks organized but violates safety, power, cooling, or maintenance principles.
-
----
-
-## 1. Mechanical safety and weight distribution
-
-Heavy equipment must be placed in the lower part of the rack.
-
-Place these components near the bottom:
-
-- UPS units.
-- External battery packs.
-- Large storage systems.
-- NAS/SAN equipment.
-- Blade chassis.
-- Heavy servers.
-- Large power modules.
-
-Do not place UPS units or battery banks in high rack units unless there is an explicit engineering justification, rack anchoring, manufacturer approval, and load calculation.
-
-Preferred bottom-up order:
-
-```text
-Bottom rack units:
-- Battery banks
-- UPS modules
-- Heavy storage
-- Blade chassis / dense compute
-- Standard servers
-- Lighter appliances
-- Patch panels / cable managers / lightweight network gear
-Top rack units:
-- Cable management, patching, blanking, or future expansion
-```
-
-When in doubt, move heavier equipment lower.
-
----
-
-## 2. UPS and power placement
-
-UPS equipment should normally be placed at the bottom of the rack or in a dedicated power rack.
-
-Avoid placing UPS units:
-
-- Above servers.
-- Above storage.
-- In the top third of the rack.
-- In a position where battery replacement becomes unsafe or difficult.
-
-For critical systems, prefer an A/B power design:
-
-```text
-Server PSU 1 -> PDU A -> UPS/feed A
-Server PSU 2 -> PDU B -> UPS/feed B
-```
-
-If equipment has only one power supply, consider whether it requires:
-
-- ATS.
-- Redundant upstream power.
-- Separate backup strategy.
-- Clear labeling as a single-power dependency.
-
-Do not claim redundancy if both power paths depend on the same UPS, same PDU, same breaker, or same physical failure point.
-
-Use vertical 0U PDUs at the rear/side of the rack when possible to avoid wasting front rack units.
-
----
-
-## 3. KVM, console, and human access
-
-Distinguish between:
-
-- A KVM switch without screen.
-- A rack console with keyboard/monitor.
-- A serial console server.
-- A crash cart connection point.
-
-A rack console with keyboard and monitor should be placed at a comfortable human operating height, usually around the middle of the rack.
-
-Avoid placing an interactive KVM console at the very bottom or very top of the rack.
-
-Reasoning:
-
-```text
-If humans operate it directly -> place at ergonomic height.
-If it is only a passive/remote device -> place near cabling or management equipment.
-```
-
-Recommended placement:
-
-```text
-Rack console / drawer KVM: middle section
-KVM switch only: near servers or management cabling
-Serial console server: near network management gear
-```
-
----
-
-## 4. Cooling and airflow
-
-Every rack layout must assume a defined airflow model.
-
-Usually:
-
-```text
-Front = cold aisle / air intake
-Rear  = hot aisle / exhaust
-```
-
-For every device, verify or assume airflow direction:
-
-- Front-to-back.
-- Back-to-front.
-- Side-to-side.
-- Port-side intake.
-- Port-side exhaust.
-
-Network switches must be oriented according to their airflow modules, not just cable convenience.
-
-Invalid layout examples:
-
-- Switch intake facing hot aisle.
-- Switch exhaust blowing into cold aisle.
-- Mixed airflow devices without ducting or containment.
-- Empty rack gaps without blanking panels.
-- Cable bundles blocking fan exhaust.
-
-All unused rack spaces should be covered with explicit blanking-panel devices unless intentionally reserved and documented. Use gray blanks (`category: blank`, color `#44475A`) so airflow containment is visible in both the YAML and rendered rack.
-
----
-
-## 5. Cable management and patching
-
-Place patch panels and switches according to the real cable entry path.
-
-If cabling enters from above:
-
-```text
-Top area:
-- Fiber patch panels
-- Copper patch panels
-- Horizontal cable managers
-- Top-of-rack switches
-```
-
-If cabling enters from below:
-
-```text
-Bottom/low area may contain:
-- Patch panels
-- Cable managers
-- Network equipment
-```
-
-Do not place Top-of-Rack switches at the bottom unless the cabling path or design explicitly justifies it.
-
-Separate cable types:
-
-```text
-Power cables: rear/one side
-Data cables: rear or opposite side
-Fiber: protected path with bend-radius control
-Copper: managed with horizontal/vertical organizers
-Console/OOB: clearly separated and labeled
-```
-
-Avoid crossing power and data cables unnecessarily.
-
-Use cable managers between dense patching zones and switches.
-
----
-
-## 6. Network architecture placement
-
-For network racks, group equipment by function but avoid creating unnecessary single points of failure.
-
-Typical order:
-
-```text
-Top:
-- Fiber patch panels
-- Copper patch panels
-- Cable managers
-
-Upper-middle:
-- Distribution/access switches
-- WiFi controllers
-- NAC/RADIUS appliances
-
-Middle/lower-middle:
-- Core switches
-- Routers
-- Firewalls
-- Load balancers
-
-Middle ergonomic zone:
-- KVM console, if interactive
-
-Rear/side:
-- PDUs A/B
-- Cable vertical managers
-```
-
-For redundant core equipment, consider whether both primary and secondary devices should be in the same rack. In a basic lab diagram this may be acceptable, but in a stronger architecture, redundant devices should be separated by:
-
-- Rack.
-- Power feed.
-- PDU.
-- Cable path.
-- Cooling dependency.
-- Maintenance zone.
-
-Do not mark a design as highly available if both HA members share the same physical failure domain.
-
----
-
-## 7. Server rack placement
-
-For server racks, use this general pattern:
-
-```text
-Top:
-- Patch panels
-- ToR switches
-- Cable managers
-
-Upper/middle:
-- 1U/2U application servers
-- Lightweight compute nodes
-
-Middle/lower:
-- Database servers
-- Storage-heavy servers
-- Backup servers
-
-Lower:
-- NAS/SAN
-- Tape library
-- Blade chassis
-- UPS only if local UPS is required
-
-Bottom:
-- UPS / battery / heaviest equipment
-```
-
-Do not place a local UPS above compute, storage, or blade chassis.
-
-If a rack uses centralized UPS from a power rack, avoid duplicating local UPS units unless there is a clear reason.
-
----
-
-## 8. Energy rack placement
-
-For dedicated UPS/power racks, use this logic:
-
-```text
-Bottom:
-- Battery banks
-- External battery modules
-- Heaviest UPS modules
-
-Lower/middle:
-- UPS main units
-- Power modules
-
-Middle:
-- ATS
-- Bypass units
-- Power distribution modules
-
-Upper/middle:
-- Energy monitoring
-- Network management cards
-- Lightweight control equipment
-
-Top:
-- Cable management
-- Blanking panels
-- Future expansion
-```
-
-Never place heavy UPS or battery banks in the top third of a rack.
-
----
-
-## 9. Blank spaces and expansion
-
-Do not leave empty rack units visually open in production diagrams.
-
-When generating YAML, represent unused units with explicit blank devices. Do not rely on empty space to imply blanking panels.
-
-Blank device type rule:
-
-```yaml
-- slug: 1u-blank
-  model: Blank Panel
-  u_height: 1
-  is_full_depth: false
-  colour: "#44475A"
-  category: blank
-```
-
-If a rack has unused space, label it as:
-
-```text
-- Blanking panel
-- Reserved expansion
-- Future server space
-- Cable management
-- Airflow containment
-```
-
-Empty space must not imply an open airflow gap.
-
-Use blanking panels to reduce hot-air recirculation.
-
-Blank panels should always be gray. Prefer `#44475A`; another gray is acceptable only if it is a full `#RRGGBB` value.
-
----
-
-## 10. Required validation checklist
-
-Before finalizing any rack diagram, validate the following:
-
-```text
-[ ] Are all heavy devices placed low?
-[ ] Are UPS and battery banks at the bottom or in a dedicated power rack?
-[ ] Is the rack stable and not top-heavy?
-[ ] Are KVM consoles placed at ergonomic height?
-[ ] Are non-interactive KVM/console devices placed near their cabling paths?
-[ ] Is airflow direction defined for each rack?
-[ ] Are switches oriented according to intake/exhaust direction?
-[ ] Are cold aisle and hot aisle assumptions clear?
-[ ] Are empty rack units covered with blanking panels or labeled as reserved?
-[ ] Are blanking panels represented as explicit gray `category: blank` devices?
-[ ] Are full-depth servers/storage/UPS devices mounted with `face: both` so the rear view is populated?
-[ ] Are PDUs placed logically, preferably as rear/side 0U PDUs?
-[ ] Are A/B power paths clearly separated?
-[ ] Are redundant systems actually separated by failure domain?
-[ ] Are patch panels near the real cable entry path?
-[ ] Are ToR switches near server cabling, not placed arbitrarily?
-[ ] Are power and data cable paths separated?
-[ ] Is there enough service clearance for replacing batteries, PSUs, fans, and disks?
-[ ] Is the layout maintainable by a technician without unsafe posture or unsafe lifting?
-```
-
-If any answer is no, revise the rack layout before outputting the final diagram.
-
----
-
-## 11. Output requirements for generated rack diagrams
-
-When generating a rack layout, include:
-
-1. Rack name and purpose.
-2. Front and rear view if relevant.
-3. Rack unit numbers.
-4. Equipment name.
-5. Equipment role.
-6. Power feed: A, B, or single.
-7. Approximate weight class: light, medium, heavy.
-8. Airflow direction.
-9. Notes about maintenance access.
-10. Warnings for questionable placements.
-
-Use warnings when the layout violates or may violate good practice:
-
-```text
-WARNING: UPS is placed too high. Move to lower rack units.
-WARNING: KVM console is too low for comfortable human access.
-WARNING: Switch airflow direction is unknown. Verify fan module orientation.
-WARNING: Redundant devices share the same rack and power path.
-WARNING: Empty rack spaces should use blanking panels.
-WARNING: Full-depth devices should use face: both when rear rendering is required.
-```
-
----
-
-## 12. Decision rules
-
-Use these decision rules when there is uncertainty:
-
-```text
-If it is heavy -> move it down.
-If it has batteries -> move it down.
-If a human operates it often -> move it to ergonomic height.
-If it needs many network cables -> move it near patching/switching.
-If it generates heat -> preserve correct airflow path.
-If it is redundant -> avoid sharing the same failure domain.
-If airflow is unknown -> flag it instead of assuming it is correct.
-If cable entry is unknown -> state the assumption explicitly.
-If power topology is unknown -> do not claim A/B redundancy.
-If it is a full-depth rack device -> use face: both unless it is truly front-only.
-If a rack unit is unused -> add a gray category: blank device.
-```
-
----
-
-## 13. Bad layout patterns to avoid
-
-Avoid these common mistakes:
-
-```text
-- UPS units in the top third of the rack.
-- Battery banks above servers.
-- KVM console at U1/U2.
-- ToR switch at the bottom when cable trays enter from above.
-- Patch panels far from cable entry.
-- Network core primary and secondary sharing all the same dependencies.
-- Open empty rack units without blanking panels.
-- Blank rack units implied by whitespace instead of explicit gray `category: blank` devices.
-- Full-depth servers, storage, UPS, or firewalls using `face: front` and disappearing from the rear view.
-- Power and data cables mixed without organization.
-- Switches installed against their required airflow direction.
-- Diagrams that show equipment placement but ignore power, airflow, and maintenance.
-```
-
----
-
-## 14. Preferred reasoning summary
-
-A correct rack architecture should be reasoned like this:
-
-```text
-First: make the rack physically safe.
-Second: make the power design correct.
-Third: make the cooling path valid.
-Fourth: make cabling clean and serviceable.
-Fifth: make human access practical.
-Sixth: separate redundancy across real failure domains.
-Finally: make the diagram visually clear.
-```
-
-Do not optimize the drawing before validating the architecture.
-
-**Strong rule for university/datacenter layouts:** never place UPS or battery banks in high rack units for visual balance. UPS and batteries must be treated as heavy infrastructure, not as ordinary IT appliances.
+Use `references/rack-layout-architecture.md` for detailed placement rules. A rack that looks organized but violates weight, power, cooling, or maintenance principles is not a correct layout.
 
 ## Rack Size Selection
 
-Rack `height` must match the user's actual hardware and use case:
+Choose rack height from the user's actual scenario:
 
-| Use Case | Rack Height | Example |
-|----------|------------|---------|
-| Homelab / desktop | `6` (6U) | Half-width devices, Raspberry Pi, small NAS |
-| Small office | `18` to `24` | 1U servers, patch panels |
-| Datacenter | `42` | Full racks with UPS, multiple servers |
+| Use case | Typical height | Notes |
+|----------|----------------|-------|
+| Desktop/homelab | `6` to `10` | Mini PCs, Raspberry Pi, small NAS, half-width devices |
+| Small office | `18` to `24` | Wall-mount or open-frame racks, patching, a few servers |
+| Datacenter | `42` | Full-size racks with UPS, servers, storage, network gear |
 
-**A homelab is NOT a 42U rack.** Using `height: 42` for a "small" layout breaks the web interface. Always ask the user about their hardware scope and choose `height` accordingly.
+Do not make every small layout `42U`. If the user's scope is ambiguous, ask one short question or choose the smallest realistic rack and state the assumption.
 
-## File Structure
+## Create-New-Layout Checklist
 
-```
-SKILL.md                    # This file — workflow and key rules
-examples/                   # Valid YAML examples for different use cases
-  homelab-small.rackula.yaml
-  homelab-router-switch.rackula.yaml
-  datacenter-42u.rackula.yaml
-  Mini-server.yaml           # Shows face: both for rear-visible equipment and gray blanks
-references/
-  schema.md                 # Top-level YAML structure, metadata, rack, placed device
-  position-system.md        # 1/6U conversion and fit check
-  device-types.md           # Device type definitions, interfaces, power ports, templates
-  container-blade.md        # Container/slot model for blade devices
-  connections.md            # Connections and rack groups
-  enums.md                  # All allowed enum values
-  collision.md              # Collision detection rules
-  rack-layout-architecture.md  # Rack placement rules, weight, power, airflow, cabling
-  troubleshooting.md        # Common mistakes and fixes
-scripts/
-  zip-yaml.js               # Packager script (built from src/)
-evals/
-  evals.json                # Test cases
-```
+When creating a `.rackula.yaml` file:
 
-## Schema Reference
+1. Choose a filename under `input/` if this workspace provides an `input/` folder; otherwise use the user-requested path.
+2. Add `metadata.id`, `metadata.name`, `version`, `name`, `racks`, `device_types`, and `settings`.
+3. Define racks with `height`, `width`, `form_factor`, `starting_unit`, `position`, and `devices`.
+4. Define all device types with valid `u_height`, `slot_width`, `colour`, `category`, depth, airflow, interfaces, and power ports when relevant.
+5. Convert all human U positions to internal positions.
+6. Check every device fits: `position + (u_height * 6) - 1 <= rack.height * 6`.
+7. Add blanks or reserved panels for unused spaces when producing a complete visual diagram.
+8. Validate that all ports referenced by `connections` exist on placed devices.
 
-For the complete schema details, read the relevant reference file:
+## Edit-Existing-Layout Checklist
 
-| Task | Reference |
-|------|-----------|
-| Top-level structure, metadata, rack, placed device | `references/schema.md` |
-| Position conversion (U → internal units) | `references/position-system.md` |
-| Device types, interfaces, power ports | `references/device-types.md` |
-| Blade chassis and container children | `references/container-blade.md` |
-| Port-to-port connections, rack groups | `references/connections.md` |
-| All enum values | `references/enums.md` |
-| Collision rules | `references/collision.md` |
-| Rack placement, weight, power, airflow, cabling | `references/rack-layout-architecture.md` |
-| Common mistakes | `references/troubleshooting.md` |
+When editing an existing `.rackula.yaml` file:
+
+1. Read the target file first.
+2. Preserve unrelated fields, unknown fields, IDs, names, rack order, device order, and user comments where possible.
+3. Use modern structures for new additions, but do not rewrite the whole file just to modernize it unless the user asks.
+4. Add missing `device_types` only for new `device_type` slugs.
+5. Revalidate positions and collisions only in the affected rack or container unless a global change requires more.
+6. Mention any assumptions or suspicious legacy fields in the final response.
+
+## Blade And Container Devices
+
+Use the modern `slots` plus `container_id`/`slot_id` model for blade chassis and nested devices. Read `references/container-blade.md` before generating this pattern.
+
+Key rule: rack-level container devices use normal rack positions; child devices inside the container use `position: 0` and must reference both `container_id` and `slot_id`.
+
+## Half-Width Devices
+
+Half-width device types use `slot_width: 1`. Placements should use `slot_position: left` or `slot_position: right`. Full-width device types use `slot_width: 2` and usually `slot_position: full`.
+
+Check collisions separately for left/right/full placements at the same U position.
 
 ## Packaging
 
-When the user wants an importable `.Rackula.zip`:
+When the user wants an importable `.Rackula.zip`, run the project workflow from the workspace root:
 
 ```bash
 pnpm run build
 pnpm run zip-yaml -- --input ./input --output ./output
 ```
 
-Report both paths: `input/<file>.rackula.yaml` and `output/<name>.Rackula.zip`.
+Report both paths:
 
-**Important:** pnpm does not pass positional args — always use `--` before flags:
-
-```bash
-# WRONG
-pnpm run zip-yaml -- ./input ./output
-
-# CORRECT
-pnpm run zip-yaml -- --input ./input --output ./output
+```text
+YAML: input/<file>.rackula.yaml
+ZIP: output/<metadata.name>.Rackula.zip
 ```
+
+Important: pnpm does not pass positional arguments here. Use explicit flags after `--`; do not run `pnpm run zip-yaml -- ./input ./output`.
+
+## Final Response
+
+For generated or edited layouts, summarize:
+
+1. Files created or modified.
+2. Packaging result, if any.
+3. Important architecture assumptions such as rack height, cable entry, airflow, and power redundancy.
+4. Warnings for unsafe or uncertain placements.
+
+Keep the response concise. The YAML file is the source of truth.
