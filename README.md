@@ -124,6 +124,10 @@ Define `slots` on the parent device type, then reference with `container_id` and
 ```
 .agents/skills/rackula/
 ├── SKILL.md                  # Skill definition — workflow and rules
+├── examples/                 # Valid YAML examples
+│   ├── homelab-small.rackula.yaml
+│   ├── homelab-router-switch.rackula.yaml
+│   └── datacenter-42u.rackula.yaml
 ├── scripts/zip-yaml.js       # Packager script
 ├── references/
 │   ├── schema.md            # Top-level structure and fields
