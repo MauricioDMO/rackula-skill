@@ -1,25 +1,18 @@
-import { mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
-
-const inputDir = process.argv[2] ?? "input";
-const outputDir = process.argv[3] ?? "output";
 const encoder = new TextEncoder();
 
-function extractMetadata(yaml, fileName) {
-  const id = yaml.match(/^metadata:\s*\n(?:[ \t]+[^\n]*\n)*?[ \t]+id:\s*["']?([^"'\n]+)["']?/m)?.[1]?.trim();
-  const name = yaml.match(/^metadata:\s*\n(?:[ \t]+[^\n]*\n)*?[ \t]+name:\s*["']?([^"'\n]+)["']?/m)?.[1]?.trim();
-
-  if (!id || !name) {
-    throw new Error(`${fileName} must include metadata.id and metadata.name`);
-  }
-
-  return { id, name };
+function writeUInt16LE(buffer: Uint8Array, offset: number, value: number): void {
+  buffer[offset] = value & 0xff;
+  buffer[offset + 1] = (value >>> 8) & 0xff;
 }
 
-function sanitizeFileName(value) {
-  return value.replace(/[\\/:*?"<>|]/g, "-").trim();
+function writeUInt32LE(buffer: Uint8Array, offset: number, value: number): void {
+  buffer[offset] = value & 0xff;
+  buffer[offset + 1] = (value >>> 8) & 0xff;
+  buffer[offset + 2] = (value >>> 16) & 0xff;
+  buffer[offset + 3] = (value >>> 24) & 0xff;
 }
 
-function crc32(data) {
+export function crc32(data: Uint8Array): number {
   let crc = 0xffffffff;
 
   for (const byte of data) {
@@ -32,19 +25,7 @@ function crc32(data) {
   return (crc ^ 0xffffffff) >>> 0;
 }
 
-function writeUInt16LE(buffer, offset, value) {
-  buffer[offset] = value & 0xff;
-  buffer[offset + 1] = (value >>> 8) & 0xff;
-}
-
-function writeUInt32LE(buffer, offset, value) {
-  buffer[offset] = value & 0xff;
-  buffer[offset + 1] = (value >>> 8) & 0xff;
-  buffer[offset + 2] = (value >>> 16) & 0xff;
-  buffer[offset + 3] = (value >>> 24) & 0xff;
-}
-
-function createZip(fileName, content) {
+export function createZip(fileName: string, content: Uint8Array): Uint8Array {
   const fileNameBytes = encoder.encode(fileName);
   const checksum = crc32(content);
   const dosTime = 0;
@@ -104,30 +85,4 @@ function createZip(fileName, content) {
   writeUInt16LE(zip, offset + 20, 0);
 
   return zip;
-}
-
-const inputStats = await stat(inputDir).catch(() => undefined);
-
-if (!inputStats?.isDirectory()) {
-  throw new Error(`Input directory not found: ${inputDir}`);
-}
-
-await mkdir(outputDir, { recursive: true });
-
-const yamlFiles = (await readdir(inputDir)).filter((fileName) => fileName.endsWith(".rackula.yaml"));
-
-if (yamlFiles.length === 0) {
-  console.log(`No .rackula.yaml files found in ${inputDir}`);
-  process.exit(0);
-}
-
-for (const yamlFile of yamlFiles) {
-  const sourcePath = `${inputDir}/${yamlFile}`;
-  const yaml = await readFile(sourcePath, "utf8");
-  const metadata = extractMetadata(yaml, yamlFile);
-  const outputName = `${sanitizeFileName(metadata.name)}-${metadata.id}.Rackula.zip`;
-  const zip = createZip(yamlFile, encoder.encode(yaml));
-
-  await writeFile(`${outputDir}/${outputName}`, zip);
-  console.log(`Created ${outputDir}/${outputName}`);
 }
