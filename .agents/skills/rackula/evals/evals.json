@@ -1,0 +1,95 @@
+{
+  "skill_name": "rackula",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "Create a rackula layout file for my homelab with a 42U 4-post-cabinet rack that has a Dell R650 1U server at U42, a Ubiquiti 48-port PoE switch at U40, and two 4U storage NAS devices at U30-33 and U26-29. Also add a 2U APC UPS at the bottom (U1-2) with va_rating of 3000 and a 24-port patch panel at U3. Include proper device_types with manufacturer, model, part_number, interfaces, and power_ports for the UPS.",
+      "expected_output": "Valid .rackula.yaml file with all device types properly defined including component arrays",
+      "files": [],
+      "expectations": [
+        "Uses modern top-level racks array, not legacy rack object",
+        "Places requested devices using modern internal 1/6U positions",
+        "Defines device types for Dell server, Ubiquiti switch, NAS, APC UPS, and patch panel",
+        "UPS device type includes va_rating 3000 and at least one power port",
+        "Device type slugs are unique and valid kebab-case"
+      ]
+    },
+    {
+      "id": 1,
+      "prompt": "I need a rack layout file for a 2-post 20U wall-mount rack with 5 generic 1U servers stacked starting at U1, a 24-port patch panel at U6, and a 1U switch at U7 with front-to-rear airflow. Make the switch half-depth (is_full_depth: false). Add a blank 2U panel at U8-9 to fill space.",
+      "expected_output": "Valid .rackula.yaml file with wall-mount form_factor and half-depth device",
+      "files": [],
+      "expectations": [
+        "Uses modern top-level racks array with a 20U rack",
+        "Uses wall-mount form_factor for the requested wall-mount rack",
+        "Places servers U1-U5, patch panel U6, switch U7, and blank U8 using internal positions",
+        "Switch device type is half-depth and front-to-rear airflow",
+        "Blank panel is 2U and category blank"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Add a new blade chassis to my-layout.rackula.yaml - put a 4U blade chassis at position 120 with 4 device bays. Then add 2 blade servers inside it at Bay 1 and Bay 2 with names 'Production Blade 1' and 'Production Blade 2'. The chassis should have colour #8BE9FD and category chassis, the blades should have colour #BD93F9.",
+      "expected_output": "Modified YAML with parent/child device relationship properly configured using container_id/slot_id model",
+      "files": ["my-layout.rackula.yaml"],
+      "expectations": [
+        "Uses modern top-level racks array",
+        "Adds a 4U blade chassis device type with slots array and category chassis",
+        "Adds blade server device type with requested colour",
+        "Adds two named blade placements using container_id and slot_id",
+        "Container children use position 0 (relative to container) not rack-level positions"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Create a rackula file for a small office server room with a 42U open-frame rack containing: a 3U UPS at the bottom with va_rating 5000, nema-l5-30p input type and 4500W maximum_draw; two 2U servers at U4-5 and U6-7 (front-to-rear airflow, 750W power ports); a 1U switch at U8 with side-to-rear airflow and 48 gigabit interfaces plus one 10G uplink interface. Include serial numbers, asset tags, and notes for each device.",
+      "expected_output": "Complete rackula file with power calculations, detailed interfaces, and extension fields",
+      "files": [],
+      "expectations": [
+        "Uses modern top-level racks array with 42U open-frame rack",
+        "Places UPS, servers, and switch at requested internal positions",
+        "UPS has va_rating 5000 and nema-l5-30p input with 4500 maximum_draw",
+        "Switch defines 48 gigabit interfaces plus one 10G uplink interface",
+        "Device types include serial numbers, asset tags, and notes"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "I have a rackula file called my-layout.rackula.yaml. Change the display_mode to 'image-label' and set show_labels_on_images to true. Also add a custom_field called 'department' with value 'infrastructure' to the rack's notes or metadata.",
+      "expected_output": "Modified settings section with display_mode change and custom_fields added",
+      "files": ["my-layout.rackula.yaml"],
+      "expectations": [
+        "Sets settings.display_mode to image-label",
+        "Sets settings.show_labels_on_images to true",
+        "Adds department custom field with value infrastructure to metadata or a rack",
+        "Preserves racks and device_types from the original layout"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Create a rackula layout with two 42U racks in a row. Rack 1 has a 4U server at U20 and a 1U switch at U18. Rack 2 has two 2U servers at U10-11 and U12-13, plus a 1U patch panel at U14. Add a rack_group called 'Main Row' that groups both racks. Use connections to link the switch in Rack 1 to the patch panel in Rack 2 via port IDs.",
+      "expected_output": "Valid rackula YAML with rack groups, multi-rack layout, and connections",
+      "files": [],
+      "expectations": [
+        "Uses modern racks array with two rack objects",
+        "Places devices at correct internal positions for each rack",
+        "rack_groups section defines 'Main Row' with both rack IDs",
+        "connections array links switch ports to patch panel ports",
+        "device_types defined for all placed device types"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Create a rackula file for a 10U half-width open-frame rack with 3 half-width mini PCs (slot_width: 1) at U1, U3, and U5 - all using left slot_position. Add a 1U full-width patch panel at U7 on the right side (slot_position: right) to fill the remaining space. Use colour #50FA7B for the mini PCs.",
+      "expected_output": "Valid rackula YAML with half-width devices properly positioned",
+      "files": [],
+      "expectations": [
+        "Uses 10U rack with open-frame form_factor",
+        "Mini PC device types have slot_width: 1 and category server",
+        "Mini PC placements use slot_position: left",
+        "Patch panel uses slot_position: right and is full-width",
+        "Devices placed at correct internal positions for 10U rack"
+      ]
+    }
+  ]
+}

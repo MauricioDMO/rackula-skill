@@ -4,6 +4,16 @@
   "private": true,
   "packageManager": "pnpm@10.33.2",
   "scripts": {
-    "zip-yaml": "node ./scripts/zip-yaml.js"
-  }
+    "build": "bun build src/zip-yaml.ts --target=node --outfile=.agents/skills/rackula/scripts/zip-yaml.js",
+    "zip-yaml": "bun run .agents/skills/rackula/scripts/zip-yaml.js"
+  },
+  "module": "index.ts",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "25.6.0"
+  },
+  "peerDependencies": {
+    "typescript": "5"
+  },
+  "dependencies": {}
 }
