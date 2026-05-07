@@ -1,3 +1,7 @@
+import { createRequire } from "node:module";
+var __commonJS = (cb, mod) => () => (mod || cb((mod = { exports: {} }).exports, mod), mod.exports);
+var __require = /* @__PURE__ */ createRequire(import.meta.url);
+
 // src/zip-yaml.ts
 import { parseArgs } from "node:util";
 

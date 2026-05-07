@@ -16,6 +16,7 @@ The installed skill contains:
 
 - Skill source at [`.agents/skills/rackula/`](../.agents/skills/rackula/)
 - Bundled ZIP packager script
+- Bundled Bun structural validator script
 - YAML fixtures for testing
 
 ## Quick Start
@@ -30,4 +31,5 @@ node .agents/skills/rackula/scripts/zip-yaml.js --input ./input --output ./outpu
 | File                                                                                          | Purpose                               |
 | --------------------------------------------------------------------------------------------- | ------------------------------------- |
 | [`.agents/skills/rackula/scripts/zip-yaml.js`](../.agents/skills/rackula/scripts/zip-yaml.js) | Bundled output                        |
+| [`.agents/skills/rackula/scripts/validate-rackula.js`](../.agents/skills/rackula/scripts/validate-rackula.js) | Bundled structural validator          |
 | [`AGENTS.md`](../AGENTS.md)                                                                   | Agent instructions for this workspace |

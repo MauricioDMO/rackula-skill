@@ -38,3 +38,9 @@ For small homelabs (desktop-sized racks), use `height: 6` with half-width device
 - **Fallback to Node when Bun is unavailable** — run `node .agents/skills/rackula/scripts/zip-yaml.js --input ./input --output ./output`
 - **Use explicit flags** — do not use positional arguments like `./input ./output`
 - **Do not require project scripts** — normal skill usage must not depend on `package.json`, `pnpm`, or a cloned development workspace
+
+## Validation Commands
+
+- **Use the bundled validator** — `bun run .agents/skills/rackula/scripts/validate-rackula.js --file ./input/layout.rackula.yaml`
+- **Fallback to Node for validation** — `node .agents/skills/rackula/scripts/validate-rackula.js --file ./input/layout.rackula.yaml`
+- **Do not assume a Node YAML package exists in the workspace** — avoid ad hoc `require("yaml")`; the bundled validator already includes its YAML parser

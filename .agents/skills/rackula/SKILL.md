@@ -30,7 +30,7 @@ Follow this sequence for Rackula work:
 4. **Define device types first.** Every placed `device_type` slug must exist in `device_types`; keep slugs unique and valid kebab-case.
 5. **Place devices with internal positions.** Convert human U positions to Rackula internal units where `position = U * 6`; U1 is the bottom of the rack.
 6. **Apply physical architecture rules.** Heavy gear low, UPS/batteries at the bottom, switches near cabling, KVM consoles at ergonomic height, explicit blanks for unused rack units when producing a complete diagram.
-7. **Validate before final output.** Check schema shape, positions, fit, collisions, `face`, device type references, colors, enum values, and port references.
+7. **Validate before final output.** Prefer the bundled `scripts/validate-rackula.js` validator when Bun is available, then check schema shape, positions, fit, collisions, `face`, device type references, colors, enum values, and port references.
 8. **Package when requested.** If the user wants an importable artifact, run the bundled `scripts/zip-yaml.js` script from this skill, then report both YAML and ZIP paths.
 
 ## Context Loading Guide
@@ -178,6 +178,32 @@ ZIP: output/<metadata.name>.Rackula.zip
 ```
 
 Important: use explicit flags. Do not use positional arguments such as `./input ./output`, and do not use package-manager scripts for normal skill usage.
+
+## Validation
+
+Use the bundled validator before final output. Prefer Bun first, then Node if Bun is unavailable:
+
+```bash
+bun run .agents/skills/rackula/scripts/validate-rackula.js --file ./input/layout.rackula.yaml
+node .agents/skills/rackula/scripts/validate-rackula.js --file ./input/layout.rackula.yaml
+bun run .agents/skills/rackula/scripts/validate-rackula.js --input ./input
+node .agents/skills/rackula/scripts/validate-rackula.js --input ./input
+```
+
+Prefer `--file` when validating one layout; use `--input` only when validating every `.rackula.yaml` file in a directory.
+
+The validator checks:
+
+- Required top-level structure: `version`, `name`, `racks`, `device_types`, `settings`
+- Modern `racks` array instead of legacy `rack`
+- Device type references and duplicate slugs
+- Rack device positions, fit, and collisions
+- Rack-level `position: 0` misuse
+- Port ID uniqueness
+- Connection schema: `a_port_id` and `b_port_id`, not `from`/`to`
+- Connection port references and `#RRGGBB` colors
+
+Do not run ad hoc Node snippets that use `require("yaml")`; the installed workspace may not have that package. Use the bundled validator instead because its YAML parser is included in `scripts/validate-rackula.js` during build.
 
 ## Final Response
 

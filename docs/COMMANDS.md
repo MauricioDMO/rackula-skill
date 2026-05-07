@@ -127,6 +127,35 @@ The output filename is derived from `metadata.name` in the YAML, not the input f
 
 Invalid filename characters (`\/:*?"<>|`) are replaced with `-`.
 
+## validate-rackula
+
+Validates Rackula YAML structure with the skill's bundled validator. The YAML parser is bundled into `validate-rackula.js`, so installed skill usage does not require `node_modules`.
+
+Validate one file, recommended when working on a single layout:
+
+```bash
+bun run .agents/skills/rackula/scripts/validate-rackula.js --file ./input/my-layout.rackula.yaml
+node .agents/skills/rackula/scripts/validate-rackula.js --file ./input/my-layout.rackula.yaml
+```
+
+Validate every `.rackula.yaml` file in a directory:
+
+```bash
+bun run .agents/skills/rackula/scripts/validate-rackula.js --input ./input
+node .agents/skills/rackula/scripts/validate-rackula.js --input ./input
+```
+
+Show help:
+
+```bash
+bun run .agents/skills/rackula/scripts/validate-rackula.js --help
+node .agents/skills/rackula/scripts/validate-rackula.js --help
+```
+
+The validator checks required top-level fields, device type references, rack fit, collisions, rack-level `position: 0`, duplicate port IDs, `connections` with `a_port_id`/`b_port_id`, referenced port IDs, and connection colors.
+
+Do not use `node -e 'require("yaml")...'`; the user's workspace may not have that package. Use the bundled validator instead.
+
 ## Exit Codes
 
 | Code | Meaning                                             |
@@ -138,6 +167,8 @@ Invalid filename characters (`\/:*?"<>|`) are replaced with `-`.
 
 1. Create or edit YAML in `input/*.rackula.yaml`
 2. Ensure `metadata.id` and `metadata.name` are present
-3. For one layout, run `bun run .agents/skills/rackula/scripts/zip-yaml.js --file ./input/<file>.rackula.yaml --output ./output`
-4. For all layouts in a folder, run `bun run .agents/skills/rackula/scripts/zip-yaml.js --input ./input --output ./output`
-5. Import the `.Rackula.zip` at [count.racku.la](https://count.racku.la/)
+3. For one layout, validate with `bun run .agents/skills/rackula/scripts/validate-rackula.js --file ./input/<file>.rackula.yaml` or `node .agents/skills/rackula/scripts/validate-rackula.js --file ./input/<file>.rackula.yaml`
+4. For one layout, package with `bun run .agents/skills/rackula/scripts/zip-yaml.js --file ./input/<file>.rackula.yaml --output ./output`
+5. For all layouts in a folder, validate with `bun run .agents/skills/rackula/scripts/validate-rackula.js --input ./input` or `node .agents/skills/rackula/scripts/validate-rackula.js --input ./input`
+6. For all layouts in a folder, package with `bun run .agents/skills/rackula/scripts/zip-yaml.js --input ./input --output ./output`
+7. Import the `.Rackula.zip` at [count.racku.la](https://count.racku.la/)

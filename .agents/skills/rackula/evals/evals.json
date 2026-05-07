@@ -103,6 +103,9 @@
       "files": [],
       "expectations": [
         "Uses .agents/skills/rackula/scripts/zip-yaml.js directly",
+        "Uses .agents/skills/rackula/scripts/validate-rackula.js for structural validation",
+        "Can run the bundled validator with node because its YAML parser is included in the generated script",
+        "Does not use ad hoc Node snippets requiring the yaml package in the user workspace",
         "Tries bun run before node when Bun is available",
         "Falls back to node if bun is unavailable",
         "Uses --file instead of --input when packaging one named YAML file",

@@ -27,6 +27,24 @@ bun run .agents/skills/rackula/scripts/zip-yaml.js --input ./input --output ./ou
 node .agents/skills/rackula/scripts/zip-yaml.js --input ./input --output ./output
 ```
 
+## YAML module missing
+
+**Symptom:**
+```bash
+yaml module missing
+```
+
+**Cause:** Node.js does not include a YAML parser, and the workspace does not have the `yaml` package installed.
+
+**Workaround:** Use the bundled validator, which includes its YAML parser:
+
+```bash
+bun run .agents/skills/rackula/scripts/validate-rackula.js --file ./input/my-layout.rackula.yaml
+node .agents/skills/rackula/scripts/validate-rackula.js --file ./input/my-layout.rackula.yaml
+```
+
+Do not use ad hoc `node -e 'require("yaml")...'` snippets; the user workspace may not have that package installed.
+
 ## Positional arguments fail
 
 **Symptom:**

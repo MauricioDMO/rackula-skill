@@ -4,7 +4,7 @@
   "private": true,
   "packageManager": "pnpm@10.33.2",
   "scripts": {
-    "build": "bun build src/zip-yaml.ts --target=node --outfile=.agents/skills/rackula/scripts/zip-yaml.js",
+    "build": "bun build src/zip-yaml.ts src/validate-rackula.ts --target=node --outdir=.agents/skills/rackula/scripts",
     "zip-yaml": "bun run .agents/skills/rackula/scripts/zip-yaml.js"
   },
   "module": "index.ts",
@@ -15,5 +15,7 @@
   "peerDependencies": {
     "typescript": "5"
   },
-  "dependencies": {}
+  "dependencies": {
+    "yaml": "^2.8.4"
+  }
 }
