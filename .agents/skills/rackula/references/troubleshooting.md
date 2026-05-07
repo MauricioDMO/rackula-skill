@@ -21,6 +21,13 @@ Common issues and solutions when working with Rackula YAML.
 - **Do not duplicate `device_types[].slug`** values
 - **Do not use `management`** as an interface type — use `1000base-t`, `10gbase-x-sfpp`, `console`, `virtual`, or `other`
 
+## Connections
+
+- **Do not use `connections[].from` or `connections[].to`** — Rackula expects `a_port_id` and `b_port_id`
+- **Do not nest endpoint objects** like `{ device_id, port_id }` inside a connection
+- **Validate schema and references separately** — first confirm connection keys are exactly valid, then confirm both port IDs exist
+- **Use `color: "#RRGGBB"`** if setting a connection color
+
 ## Rack Size
 
 For small homelabs (desktop-sized racks), use `height: 6` with half-width devices like Raspberry Pi. A 42U rack is a full-size data center rack, not a "small" layout.

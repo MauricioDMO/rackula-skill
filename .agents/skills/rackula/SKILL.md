@@ -62,6 +62,8 @@ Follow this sequence for Rackula work:
 - Do not use `management` as an interface type; use `1000base-t`, `10gbase-x-sfpp`, `console`, `virtual`, or `other` as appropriate.
 - Quote `device_bays[].position` values if working with legacy device bays.
 - Prefer `connections` over deprecated `cables` for port-to-port links.
+- `connections` entries must use `a_port_id` and `b_port_id` only. Do not emit `from`, `to`, nested endpoint objects, `device_id`, or `port_id` pairs inside a connection.
+- For every connection, validate that both `a_port_id` and `b_port_id` exactly match existing `racks[].devices[].ports[].id` values.
 
 ## Rack Architecture Reasoning
 
@@ -100,7 +102,7 @@ When creating a `.rackula.yaml` file:
 5. Convert all human U positions to internal positions.
 6. Check every device fits: `position + (u_height * 6) - 1 <= rack.height * 6`.
 7. Add blanks or reserved panels for unused spaces when producing a complete visual diagram.
-8. Validate that all ports referenced by `connections` exist on placed devices.
+8. Validate that all `connections` use `a_port_id`/`b_port_id` and that both referenced port IDs exist on placed devices.
 
 ## Edit-Existing-Layout Checklist
 

@@ -91,3 +91,24 @@ Required: `id`, `device_type`, `position`, `face`.
 Optional: `name`, `slot_position`, `ports`, `front_image`, `rear_image`, `colour_override`, `container_id`, `slot_id`, `notes`, `custom_fields`.
 
 If `container_id` is set, `slot_id` is required.
+
+## Connections
+
+Use `connections` for port-to-port links. Each connection references placed-device port IDs directly:
+
+```yaml
+connections:
+  - id: "conn-router-switch"
+    a_port_id: "router-lan"
+    b_port_id: "switch-uplink-router"
+    label: "Router LAN to switch uplink"
+    color: "#FFB86C"
+```
+
+Required: `id`, `a_port_id`, `b_port_id`.
+
+Optional: `label`, `color`.
+
+Do not use `from`/`to` objects or nested `{ device_id, port_id }` endpoints. This shape is invalid for Rackula even if it is human-readable.
+
+Validation: both `a_port_id` and `b_port_id` must match existing `racks[].devices[].ports[].id` values, and `color` must be `#RRGGBB` when present.

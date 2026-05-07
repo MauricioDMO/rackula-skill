@@ -76,7 +76,10 @@
         "Uses modern racks array with two rack objects",
         "Places devices at correct internal positions for each rack",
         "rack_groups section defines 'Main Row' with both rack IDs",
-        "connections array links switch ports to patch panel ports",
+        "connections array links switch ports to patch panel ports using a_port_id and b_port_id",
+        "Does not use connections[].from or connections[].to",
+        "Does not use nested device_id/port_id endpoint objects inside connections",
+        "Validates that every a_port_id and b_port_id exists in racks[].devices[].ports[].id",
         "device_types defined for all placed device types"
       ]
     },
