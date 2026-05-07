@@ -72,7 +72,7 @@ devices:
     device_type: "dell-r650"    # slug reference to device_types
     name: "Web Server 1"
     position: 240              # internal units (U40 = 240)
-    face: front                # front, rear, or both
+    face: both                 # front, rear, or both; use both for rear-visible full-depth devices
     slot_position: full        # left, right, or full for half-width
     ports:
       - id: "port-1"
@@ -85,6 +85,8 @@ devices:
 ```
 
 Required: `id`, `device_type`, `position`, `face`.
+
+`face` is Rackula's mounted-face setting in YAML. Use `face: both` for rack-mounted servers, storage, UPS, firewalls, and other full-depth devices that must appear in the rear view. Use `face: front` only for truly front-only/passive items such as patch panels or front-only blanks.
 
 Optional: `name`, `slot_position`, `ports`, `front_image`, `rear_image`, `colour_override`, `container_id`, `slot_id`, `notes`, `custom_fields`.
 

@@ -22,6 +22,8 @@ When a user asks for an importable Rackula artifact in a workspace with `input/`
 - Use `racks: [...]` (plural). The singular `rack:` is legacy input only — never emit it in new files.
 - Modern positions use internal 1/6U units where `6 units = 1U`. See `references/position-system.md`.
 - Use `container_id`/`slot_id` for blade/container devices. See `references/container-blade.md`.
+- For rack-mounted servers, storage, UPS, firewalls, and other full-depth devices that should appear from the rear, set the YAML `face: both` (Rackula mounted face = both). Use `face: front` only for truly front-only/passive items such as patch panels or front-only blanks.
+- Fill unused rack units with explicit blank devices, not visual gaps. Blank device types must use `category: blank` and a gray `#RRGGBB` color, preferably `#44475A`.
 - Quote `device_bays[].position` as a string — it's a string in the current schema.
 - Do not use `management` as an interface type.
 - Use `#RRGGBB` colors only — not `#FFF`, named colors, or `rgb(...)`.
@@ -171,7 +173,7 @@ Invalid layout examples:
 - Empty rack gaps without blanking panels.
 - Cable bundles blocking fan exhaust.
 
-All unused rack spaces should be covered with blanking panels unless intentionally reserved and documented.
+All unused rack spaces should be covered with explicit blanking-panel devices unless intentionally reserved and documented. Use gray blanks (`category: blank`, color `#44475A`) so airflow containment is visible in both the YAML and rendered rack.
 
 ---
 
@@ -333,6 +335,19 @@ Never place heavy UPS or battery banks in the top third of a rack.
 
 Do not leave empty rack units visually open in production diagrams.
 
+When generating YAML, represent unused units with explicit blank devices. Do not rely on empty space to imply blanking panels.
+
+Blank device type rule:
+
+```yaml
+- slug: 1u-blank
+  model: Blank Panel
+  u_height: 1
+  is_full_depth: false
+  colour: "#44475A"
+  category: blank
+```
+
 If a rack has unused space, label it as:
 
 ```text
@@ -346,6 +361,8 @@ If a rack has unused space, label it as:
 Empty space must not imply an open airflow gap.
 
 Use blanking panels to reduce hot-air recirculation.
+
+Blank panels should always be gray. Prefer `#44475A`; another gray is acceptable only if it is a full `#RRGGBB` value.
 
 ---
 
@@ -363,6 +380,8 @@ Before finalizing any rack diagram, validate the following:
 [ ] Are switches oriented according to intake/exhaust direction?
 [ ] Are cold aisle and hot aisle assumptions clear?
 [ ] Are empty rack units covered with blanking panels or labeled as reserved?
+[ ] Are blanking panels represented as explicit gray `category: blank` devices?
+[ ] Are full-depth servers/storage/UPS devices mounted with `face: both` so the rear view is populated?
 [ ] Are PDUs placed logically, preferably as rear/side 0U PDUs?
 [ ] Are A/B power paths clearly separated?
 [ ] Are redundant systems actually separated by failure domain?
@@ -400,6 +419,7 @@ WARNING: KVM console is too low for comfortable human access.
 WARNING: Switch airflow direction is unknown. Verify fan module orientation.
 WARNING: Redundant devices share the same rack and power path.
 WARNING: Empty rack spaces should use blanking panels.
+WARNING: Full-depth devices should use face: both when rear rendering is required.
 ```
 
 ---
@@ -418,6 +438,8 @@ If it is redundant -> avoid sharing the same failure domain.
 If airflow is unknown -> flag it instead of assuming it is correct.
 If cable entry is unknown -> state the assumption explicitly.
 If power topology is unknown -> do not claim A/B redundancy.
+If it is a full-depth rack device -> use face: both unless it is truly front-only.
+If a rack unit is unused -> add a gray category: blank device.
 ```
 
 ---
@@ -434,6 +456,8 @@ Avoid these common mistakes:
 - Patch panels far from cable entry.
 - Network core primary and secondary sharing all the same dependencies.
 - Open empty rack units without blanking panels.
+- Blank rack units implied by whitespace instead of explicit gray `category: blank` devices.
+- Full-depth servers, storage, UPS, or firewalls using `face: front` and disappearing from the rear view.
 - Power and data cables mixed without organization.
 - Switches installed against their required airflow direction.
 - Diagrams that show equipment placement but ignore power, airflow, and maintenance.
@@ -479,6 +503,7 @@ examples/                   # Valid YAML examples for different use cases
   homelab-small.rackula.yaml
   homelab-router-switch.rackula.yaml
   datacenter-42u.rackula.yaml
+  Mini-server.yaml           # Shows face: both for rear-visible equipment and gray blanks
 references/
   schema.md                 # Top-level YAML structure, metadata, rack, placed device
   position-system.md        # 1/6U conversion and fit check

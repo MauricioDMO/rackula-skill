@@ -1,0 +1,100 @@
+metadata:
+  id: 18dac75f-e49f-4564-bba4-2a897bb34334
+  name: My Layout
+  schema_version: "1.0"
+version: 0.9.4
+name: My Layout
+racks:
+  - id: d5HYX1z1dVhkCcJUW8qE3
+    name: Mini Server
+    height: 8
+    width: 19
+    desc_units: false
+    form_factor: 4-post-cabinet
+    starting_unit: 1
+    position: 0
+    devices:
+      - id: 48298562-70e5-427f-8533-304abd8536ff
+        device_type: 2u-server
+        position: 24
+        face: both
+        slot_position: full
+      - id: 077a0cc3-fa7c-4c18-8df3-e690ad9b71b6
+        device_type: 1u-router-firewall
+        position: 48
+        face: both
+        slot_position: full
+      - id: 8aba66b3-dca1-4b5d-a60c-71d0c3bb4a05
+        device_type: 24-port-switch
+        position: 42
+        face: front
+        slot_position: full
+      - id: c12a856a-5c28-42da-8555-3cd554e759fe
+        device_type: 1u-storage
+        position: 18
+        face: both
+        slot_position: full
+      - id: 070782ef-c852-407e-8325-4341f176602a
+        device_type: 2u-ups
+        position: 6
+        face: both
+        slot_position: full
+      - id: d3b580df-08d2-46f3-97c2-f69b8a7c4308
+        device_type: 1u-blank
+        position: 36
+        face: front
+        slot_position: full
+device_types:
+  - slug: 1u-server
+    model: Server
+    u_height: 1
+    slot_width: 2
+    colour: "#4A7A8A"
+    category: server
+  - slug: 2u-server
+    model: Server
+    u_height: 2
+    slot_width: 2
+    colour: "#4A7A8A"
+    category: server
+  - slug: 1u-router-firewall
+    model: Router/Firewall
+    u_height: 1
+    slot_width: 2
+    colour: "#7B6BA8"
+    category: network
+  - slug: 24-port-switch
+    model: Switch (24-Port)
+    u_height: 1
+    slot_width: 2
+    colour: "#7B6BA8"
+    category: network
+  - slug: 1u-half-switch
+    model: Half Switch (8-Port)
+    u_height: 1
+    slot_width: 1
+    is_full_depth: false
+    colour: "#7B6BA8"
+    category: network
+  - slug: 1u-storage
+    model: Storage
+    u_height: 1
+    slot_width: 2
+    colour: "#3D7A4A"
+    category: storage
+  - slug: 2u-ups
+    model: UPS
+    u_height: 2
+    slot_width: 2
+    colour: "#A84A4A"
+    category: power
+  - slug: 1u-blank
+    model: Blank Panel
+    u_height: 1
+    slot_width: 2
+    is_full_depth: false
+    colour: "#44475A"
+    category: blank
+settings:
+  display_mode: label
+  show_labels_on_images: false

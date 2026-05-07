@@ -9,6 +9,7 @@
       "expectations": [
         "Uses modern top-level racks array, not legacy rack object",
         "Places requested devices using modern internal 1/6U positions",
+        "Full-depth server, storage, and UPS placements use face: both so they appear in rear view",
         "Defines device types for Dell server, Ubiquiti switch, NAS, APC UPS, and patch panel",
         "UPS device type includes va_rating 3000 and at least one power port",
         "Device type slugs are unique and valid kebab-case"
@@ -23,8 +24,9 @@
         "Uses modern top-level racks array with a 20U rack",
         "Uses wall-mount form_factor for the requested wall-mount rack",
         "Places servers U1-U5, patch panel U6, switch U7, and blank U8 using internal positions",
+        "Server placements use face: both when rear view should show installed equipment",
         "Switch device type is half-depth and front-to-rear airflow",
-        "Blank panel is 2U and category blank"
+        "Blank panel is 2U, category blank, and gray #44475A"
       ]
     },
     {

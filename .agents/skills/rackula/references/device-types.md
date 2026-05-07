@@ -162,5 +162,6 @@ device_bays:
 
 - **Do not use `u_height: 0`** — minimum is `0.5`
 - **Use `#RRGGBB` only** — not `#FFF`, named colors, or `rgb(...)`
+- **Blank panels must be gray** — use `category: blank` and prefer `colour: "#44475A"`
 - **Do not duplicate `device_types[].slug`** values
 - **Quote `device_bays[].position`** as `"1"` — it's a string in the current schema

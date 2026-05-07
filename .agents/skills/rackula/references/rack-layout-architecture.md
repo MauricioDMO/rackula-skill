@@ -69,8 +69,10 @@ Assume front = cold aisle (intake), rear = hot aisle (exhaust).
 
 - Verify or assume airflow direction for each device.
 - Orient switches according to their fan modules, not cable convenience.
-- Fill all empty rack spaces with blanking panels.
+- Fill all empty rack spaces with explicit gray blanking-panel devices (`category: blank`, preferably `colour: "#44475A"`).
 - Keep cable bundles away from fan exhaust paths.
+
+Use `face: both` for rack-mounted servers, storage, UPS, firewalls, and other full-depth devices that should appear from the rear. Otherwise the rear view can incorrectly omit installed equipment. Use `face: front` only for truly front-only/passive items such as patch panels or front-only blanks.
 
 ## 5. Cable Management
 
@@ -120,7 +122,8 @@ Top: cable management, blanking panels, future expansion
 - ToR switch at the bottom when cable trays enter from above.
 - Patch panels far from cable entry.
 - Redundant devices sharing all same dependencies.
-- Open empty rack units without blanking panels.
+- Open empty rack units without explicit gray blanking-panel devices.
+- Full-depth devices using `face: front` and disappearing from the rear view.
 - Switches installed against required airflow direction.
 
 ## Decision Rules
