@@ -1,6 +1,6 @@
 # Rackula YAML Schema
 
-Top-level structure, field requirements, and archive format.
+Top-level structure and field requirements.
 
 ## Top-Level YAML Structure
 
@@ -89,21 +89,3 @@ Required: `id`, `device_type`, `position`, `face`.
 Optional: `name`, `slot_position`, `ports`, `front_image`, `rear_image`, `colour_override`, `container_id`, `slot_id`, `notes`, `custom_fields`.
 
 If `container_id` is set, `slot_id` is required.
-
-## Archive Format
-
-Modern `.Rackula.zip` structure:
-
-```
-My Layout-550e8400-e29b-41d4-a716-446655440000.Rackula.zip
-└── My Layout-550e8400-e29b-41d4-a716-446655440000/
-    ├── my-layout.rackula.yaml
-    └── assets/
-        └── device-slug/
-            ├── front.png
-            ├── rear.png
-            ├── placed-device-id-front.png
-            └── placed-device-id-rear.png
-```
-
-Only custom images are included. Bundled Rackula images load from the app.
