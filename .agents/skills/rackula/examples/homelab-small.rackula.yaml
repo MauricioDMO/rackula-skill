@@ -1,0 +1,55 @@
+metadata:
+  id: e0aaac22-61c0-4adb-8fb8-a01a64608d41
+  name: Homelab Small
+  schema_version: "1.0"
+version: 1.0.0
+name: Homelab Small
+racks:
+  - id: C3CZ650hqJ7XnTO6xmEtu
+    name: Racky McRackface
+    height: 6
+    width: 19
+    desc_units: false
+    form_factor: 4-post-cabinet
+    starting_unit: 1
+    position: 0
+    devices:
+      - id: 63b91f72-0792-493e-bd0f-bd3bdebd5689
+        device_type: 1u-server
+        position: 30
+        face: both
+        slot_position: full
+      - id: 6344132f-445b-4710-bc76-199d7a0728b1
+        device_type: raspberry-pi-5
+        position: 24
+        face: front
+        slot_position: left
+      - id: 09641575-a3e6-451f-a031-058e4fd706c1
+        device_type: raspberry-pi-4
+        position: 24
+        face: front
+        slot_position: right
+device_types:
+  - slug: 1u-server
+    model: 1U Server
+    u_height: 1
+    slot_width: 2
+    colour: "#4A7A8A"
+    category: server
+  - slug: raspberry-pi-5
+    model: Raspberry Pi 5
+    u_height: 0.5
+    slot_width: 1
+    is_full_depth: false
+    colour: "#4A7A8A"
+    category: server
+  - slug: raspberry-pi-4
+    model: Raspberry Pi 4
+    u_height: 0.5
+    slot_width: 1
+    is_full_depth: false
+    colour: "#4A7A8A"
+    category: server
+settings:
+  display_mode: label
+  show_labels_on_images: false

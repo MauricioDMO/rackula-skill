@@ -1,0 +1,105 @@
+metadata:
+  id: 7f2d4a1b-8c3e-4f5a-9b6d-1e2f3a4b5c6d
+  name: Mi Homelab
+  schema_version: "1.0"
+version: 1.0.0
+name: Mi Homelab
+racks:
+  - id: homelab-main
+    name: Homelab Principal
+    height: 6
+    width: 19
+    desc_units: false
+    form_factor: 4-post-cabinet
+    starting_unit: 1
+    position: 0
+    devices:
+      - id: dev-router-01
+        device_type: router-ultraflex
+        name: Router Principal
+        position: 30
+        face: front
+        slot_position: full
+      - id: dev-switch-01
+        device_type: switch-gigabit-48
+        name: Switch 48P PoE
+        position: 24
+        face: front
+        slot_position: full
+      - id: dev-nas-01
+        device_type: nas-4-bay
+        name: NAS Synology
+        position: 12
+        face: front
+        slot_position: full
+      - id: dev-pi-hass-01
+        device_type: raspberry-pi-5
+        name: Home Assistant
+        position: 6
+        face: front
+        slot_position: left
+      - id: dev-pi-dns-01
+        device_type: raspberry-pi-4
+        name: Pi-hole DNS
+        position: 6
+        face: front
+        slot_position: right
+device_types:
+  - slug: router-ultraflex
+    model: Router Ultraflex
+    u_height: 1
+    slot_width: 2
+    is_full_depth: true
+    colour: "#B22222"
+    category: network
+    interfaces:
+      - name: WAN
+        type: 10gbase-x-sfpp
+      - name: LAN
+        type: 10gbase-x-sfpp
+      - name: Management
+        type: 1000base-t
+        mgmt_only: true
+  - slug: switch-gigabit-48
+    model: 48-Port Gigabit Switch PoE
+    u_height: 1
+    slot_width: 2
+    is_full_depth: true
+    airflow: front-to-rear
+    colour: "#7B6BA8"
+    category: network
+    interfaces:
+      - name: Uplink
+        type: 10gbase-x-sfpp
+      - name: Management
+        type: 1000base-t
+        mgmt_only: true
+  - slug: nas-4-bay
+    model: NAS 4-Bay
+    u_height: 2
+    slot_width: 2
+    is_full_depth: true
+    airflow: front-to-rear
+    colour: "#CD853F"
+    category: storage
+    power_ports:
+      - name: Power
+        type: iec-60320-c14
+        maximum_draw: 100
+  - slug: raspberry-pi-5
+    model: Raspberry Pi 5
+    u_height: 0.5
+    slot_width: 1
+    is_full_depth: false
+    colour: "#4A7A8A"
+    category: server
+  - slug: raspberry-pi-4
+    model: Raspberry Pi 4
+    u_height: 0.5
+    slot_width: 1
+    is_full_depth: false
+    colour: "#4A7A8A"
+    category: server
+settings:
+  display_mode: label
+  show_labels_on_images: false

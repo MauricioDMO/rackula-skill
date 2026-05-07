@@ -1,0 +1,88 @@
+metadata:
+  id: 550e8400-e29b-41d4-a716-446655440000
+  name: Datacenter Primary
+  schema_version: "1.0"
+version: 1.0.0
+name: Datacenter Primary
+racks:
+  - id: rack-primary
+    name: Primary Rack
+    height: 42
+    width: 19
+    desc_units: false
+    show_rear: true
+    form_factor: 4-post-cabinet
+    starting_unit: 1
+    position: 0
+    devices:
+      - id: dev-ups-01
+        device_type: ups-2u
+        name: UPS Primary
+        position: 6
+        face: front
+      - id: dev-pdu-01
+        device_type: pdu
+        name: PDU A
+        position: 18
+        face: front
+      - id: dev-server-01
+        device_type: dell-r650
+        name: Web Server 1
+        position: 24
+        face: front
+      - id: dev-server-02
+        device_type: dell-r650
+        name: Web Server 2
+        position: 30
+        face: front
+      - id: dev-switch-01
+        device_type: switch-48-port
+        name: Core Switch
+        position: 36
+        face: front
+device_types:
+  - slug: dell-r650
+    manufacturer: Dell
+    model: PowerEdge R650
+    part_number: R650
+    u_height: 1
+    slot_width: 2
+    is_full_depth: true
+    airflow: front-to-rear
+    colour: "#4A7A8A"
+    category: server
+  - slug: switch-48-port
+    model: 48-Port Switch
+    u_height: 1
+    slot_width: 2
+    is_full_depth: true
+    airflow: side-to-rear
+    colour: "#7B6BA8"
+    category: network
+    interfaces:
+      - name: Management
+        type: 1000base-t
+        mgmt_only: true
+  - slug: ups-2u
+    model: 2U UPS
+    u_height: 2
+    slot_width: 2
+    is_full_depth: true
+    airflow: front-to-rear
+    colour: "#A84A4A"
+    category: power
+    va_rating: 3000
+    power_ports:
+      - name: Input
+        type: iec-60320-c14
+        maximum_draw: 750
+  - slug: pdu
+    model: PDU
+    u_height: 1
+    slot_width: 2
+    is_full_depth: true
+    colour: "#555555"
+    category: power
+settings:
+  display_mode: label
+  show_labels_on_images: false
