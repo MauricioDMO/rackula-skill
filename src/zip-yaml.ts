@@ -1,7 +1,7 @@
 import { parseArgs } from "node:util";
 import { run } from "./runner";
 
-const { values } = parseArgs({
+const { values, positionals } = parseArgs({
   options: {
     text: {
       type: "string",
@@ -34,26 +34,31 @@ const { values } = parseArgs({
 });
 
 if (values.help) {
-  console.log(`Usage: bun run zip-yaml.ts [options]
+  console.log(`Usage:
+  bun run .agents/skills/rackula/scripts/zip-yaml.js [options]
+  node .agents/skills/rackula/scripts/zip-yaml.js [options]
 
 Options:
-  -t, --text <yaml>     YAML content as string
-  -f, --file <path>     Process specific YAML file
-  -i, --input <dir>     Input directory (required without -t/-f)
-  -o, --output <dir>    Output directory (default: cwd)
-  --name <name>         Override metadata.name for output filename
-  --stdout              Write ZIP to stdout
+  -i, --input <dir>     Batch package directory containing .rackula.yaml files
+  -f, --file <path>     Package one specific .rackula.yaml file
+  -t, --text <yaml>     Package YAML content as string; use - for stdin
+  -o, --output <dir>    Output directory for .Rackula.zip files (default: cwd)
+  --name <name>         Override metadata.name for output ZIP filename
+  --stdout              Write ZIP bytes to stdout instead of a file
   -h, --help            Show this help
+
+Examples:
+  bun run .agents/skills/rackula/scripts/zip-yaml.js --file ./input/layout.rackula.yaml --output ./output
+  bun run .agents/skills/rackula/scripts/zip-yaml.js --input ./input --output ./output
+  node .agents/skills/rackula/scripts/zip-yaml.js --file ./input/layout.rackula.yaml --stdout > layout.Rackula.zip
 `);
   process.exit(0);
 }
 
-const positionalArgs = (values._ as string[]) ?? [];
-
 try {
   await run({
-    input: values.input ?? positionalArgs[0],
-    output: values.output ?? positionalArgs[1],
+    input: values.input ?? positionals[0],
+    output: values.output ?? positionals[1],
     text: values.text,
     file: values.file,
     name: values.name,

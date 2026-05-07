@@ -27,5 +27,7 @@ For small homelabs (desktop-sized racks), use `height: 6` with half-width device
 
 ## Command Line
 
-- **pnpm does not pass positional arguments** — always use explicit flags: `pnpm run zip-yaml -- --input ./input --output ./output`
-- **Bun build needs `--target=node`** — otherwise `parseArgs` fails with a browser polyfill error
+- **Use the bundled script** — package with `bun run .agents/skills/rackula/scripts/zip-yaml.js --input ./input --output ./output`
+- **Fallback to Node when Bun is unavailable** — run `node .agents/skills/rackula/scripts/zip-yaml.js --input ./input --output ./output`
+- **Use explicit flags** — do not use positional arguments like `./input ./output`
+- **Do not require project scripts** — normal skill usage must not depend on `package.json`, `pnpm`, or a cloned development workspace

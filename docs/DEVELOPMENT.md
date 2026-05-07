@@ -1,5 +1,7 @@
 # Development
 
+This page is for maintainers who are editing the packager source. Agents doing normal Rackula packaging should use the bundled script documented in [Commands](./COMMANDS.md), not these development commands.
+
 ## Source Structure
 
 ```
@@ -47,8 +49,8 @@ The source TypeScript is split into modules for maintainability; the bundled out
 
 1. Edit source files in `src/`
 2. Run `pnpm run build`
-3. Test with `pnpm run zip-yaml -- --input ./input --output ./output`
-4. Package the skill with `python3 -m scripts.package_skill .agents/skills/rackula/` (from skill-creator)
+3. Test the bundled output with `bun run .agents/skills/rackula/scripts/zip-yaml.js --input ./input --output ./output`
+4. Test the Node fallback with `node .agents/skills/rackula/scripts/zip-yaml.js --input ./input --output ./output`
 
 ## Running from Source
 

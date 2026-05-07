@@ -1,7 +1,7 @@
 ---
 name: rackula
 description: |
-  Rackula rack layout YAML creation, editing, validation, packaging, and documentation. Use this skill whenever the user works with `.rackula.yaml` files, `.Rackula.zip` archives, Rackula layouts, rack diagrams, rack visualization, homelab/server rack planning, NetBox-style DCIM device definitions, device placements, rack U positions, blade/container devices, half-width devices, ports, rack connections, or asks to create an importable Rackula file. When a Rackula workspace provides an `input/` folder and `zip-yaml` tool, create generated YAML there and run the tool to produce the `.Rackula.zip`. Prefer this skill over generic YAML help whenever rack equipment, racks, U positions, device types, Rackula YAML, or Rackula ZIP packaging are involved. Do not use for unrelated YAML configuration.
+  Rackula rack layout YAML creation, editing, validation, packaging, and documentation. Use this skill whenever the user works with `.rackula.yaml` files, `.Rackula.zip` archives, Rackula layouts, rack diagrams, rack visualization, homelab/server rack planning, NetBox-style DCIM device definitions, device placements, rack U positions, blade/container devices, half-width devices, ports, rack connections, or asks to create an importable Rackula file. When packaging, use the bundled script at `scripts/zip-yaml.js` inside this skill; do not rely on a project `package.json` or repo-specific npm scripts. Prefer this skill over generic YAML help whenever rack equipment, racks, U positions, device types, Rackula YAML, or Rackula ZIP packaging are involved. Do not use for unrelated YAML configuration.
 ---
 
 # Rackula Skill
@@ -31,7 +31,7 @@ Follow this sequence for Rackula work:
 5. **Place devices with internal positions.** Convert human U positions to Rackula internal units where `position = U * 6`; U1 is the bottom of the rack.
 6. **Apply physical architecture rules.** Heavy gear low, UPS/batteries at the bottom, switches near cabling, KVM consoles at ergonomic height, explicit blanks for unused rack units when producing a complete diagram.
 7. **Validate before final output.** Check schema shape, positions, fit, collisions, `face`, device type references, colors, enum values, and port references.
-8. **Package when requested.** If the user wants an importable artifact, build and run `zip-yaml`, then report both YAML and ZIP paths.
+8. **Package when requested.** If the user wants an importable artifact, run the bundled `scripts/zip-yaml.js` script from this skill, then report both YAML and ZIP paths.
 
 ## Context Loading Guide
 
@@ -127,12 +127,46 @@ Check collisions separately for left/right/full placements at the same U positio
 
 ## Packaging
 
-When the user wants an importable `.Rackula.zip`, run the project workflow from the workspace root:
+When the user wants an importable `.Rackula.zip`, use the bundled script included with this skill. Do not look for, require, or run repo-specific `package.json` scripts.
+
+Choose the smallest packaging mode that matches the task:
+
+- Use `--file` for one specific `.rackula.yaml`; this packages only that file and avoids batch processing unrelated files.
+- Use `--input` only when the user asks to package a directory or all layouts in an input folder.
+- Use `--text` for YAML content passed through stdin or an inline string.
+
+Prefer Bun first for directory packaging:
 
 ```bash
-pnpm run build
-pnpm run zip-yaml -- --input ./input --output ./output
+bun run .agents/skills/rackula/scripts/zip-yaml.js --input ./input --output ./output
 ```
+
+If Bun is not installed or the command fails because `bun` is unavailable, use Node:
+
+```bash
+node .agents/skills/rackula/scripts/zip-yaml.js --input ./input --output ./output
+```
+
+Use the same direct-script pattern for other modes:
+
+```bash
+bun run .agents/skills/rackula/scripts/zip-yaml.js --file ./input/layout.rackula.yaml --output ./output
+node .agents/skills/rackula/scripts/zip-yaml.js --file ./input/layout.rackula.yaml --output ./output
+```
+
+Available options:
+
+| Flag | Short | Purpose |
+|------|-------|---------|
+| `--input <dir>` | `-i` | Package every `.rackula.yaml` file in a directory |
+| `--file <path>` | `-f` | Package one specific `.rackula.yaml` file |
+| `--text <yaml>` | `-t` | Package YAML content from a string; use `--text -` for stdin |
+| `--output <dir>` | `-o` | Write `.Rackula.zip` output files to a directory |
+| `--name <name>` | | Override `metadata.name` for the output ZIP filename |
+| `--stdout` | | Write ZIP bytes to stdout instead of a file |
+| `--help` | `-h` | Show command help |
+
+The script path is relative to the user's workspace when the skill is installed at `.agents/skills/rackula`. If the skill loader reports a different base directory, use that base directory plus `scripts/zip-yaml.js`.
 
 Report both paths:
 
@@ -141,7 +175,7 @@ YAML: input/<file>.rackula.yaml
 ZIP: output/<metadata.name>.Rackula.zip
 ```
 
-Important: pnpm does not pass positional arguments here. Use explicit flags after `--`; do not run `pnpm run zip-yaml -- ./input ./output`.
+Important: use explicit flags. Do not use positional arguments such as `./input ./output`, and do not use package-manager scripts for normal skill usage.
 
 ## Final Response
 

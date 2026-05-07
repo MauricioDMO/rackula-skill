@@ -92,6 +92,23 @@
         "Patch panel uses slot_position: right and is full-width",
         "Devices placed at correct internal positions for 10U rack"
       ]
+    },
+    {
+      "id": 7,
+      "prompt": "Package the rackula YAML files in ./input into importable Rackula ZIP files in ./output. Assume the rackula skill is installed but the original development repo is not cloned, so package.json scripts may not exist.",
+      "expected_output": "Uses the bundled skill script directly with Bun first and Node as fallback",
+      "files": [],
+      "expectations": [
+        "Uses .agents/skills/rackula/scripts/zip-yaml.js directly",
+        "Tries bun run before node when Bun is available",
+        "Falls back to node if bun is unavailable",
+        "Uses --file instead of --input when packaging one named YAML file",
+        "Uses --input only when packaging all YAML files in a directory",
+        "Recognizes --output, --name, --text, --stdout, and --help options",
+        "Does not run pnpm run build or pnpm run zip-yaml",
+        "Does not require package.json or a cloned development workspace",
+        "Uses explicit --input and --output flags"
+      ]
     }
   ]
 }

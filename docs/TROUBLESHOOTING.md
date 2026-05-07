@@ -1,30 +1,44 @@
 # Troubleshooting
 
-## pnpm positional arguments not passed
+## Packaging command not found
 
 **Symptom:**
 ```bash
-pnpm run zip-yaml -- ./input ./output
+bun: command not found
+```
+
+**Workaround:** Use Node with the bundled script:
+
+```bash
+node .agents/skills/rackula/scripts/zip-yaml.js --input ./input --output ./output
+```
+
+## Package scripts unavailable
+
+**Symptom:**
+```bash
+ERR_PNPM_NO_SCRIPT Missing script: zip-yaml
+```
+
+**Workaround:** Do not use package-manager scripts for normal skill usage. Use the bundled script directly:
+
+```bash
+bun run .agents/skills/rackula/scripts/zip-yaml.js --input ./input --output ./output
+node .agents/skills/rackula/scripts/zip-yaml.js --input ./input --output ./output
+```
+
+## Positional arguments fail
+
+**Symptom:**
+```bash
+node .agents/skills/rackula/scripts/zip-yaml.js ./input ./output
 # → Missing required --input and/or --output flags
 ```
 
-**Workaround:** Use explicit flags instead of positional arguments:
+**Workaround:** Use explicit flags:
 
 ```bash
-pnpm run zip-yaml -- --input ./input --output ./output
-```
-
-## Bun build fails with parseArgs error
-
-**Symptom:**
-```
-error: Browser polyfill for module "node:util" doesn't have a matching export named "parseArgs"
-```
-
-**Workaround:** Add `--target=node` to the build command in `package.json`:
-
-```bash
-bun build src/zip-yaml.ts --target=node --outfile=.agents/skills/rackula/scripts/zip-yaml.js
+node .agents/skills/rackula/scripts/zip-yaml.js --input ./input --output ./output
 ```
 
 ## Missing metadata.name
