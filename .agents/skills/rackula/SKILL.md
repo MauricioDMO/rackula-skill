@@ -29,7 +29,7 @@ Follow this sequence for Rackula work:
 3. **Model the physical rack before YAML.** Decide rack size, rack type, heavy-device placement, power assumptions, airflow, cabling path, maintenance access, and expansion space.
 4. **Define device types first.** Every placed `device_type` slug must exist in `device_types`; keep slugs unique and valid kebab-case.
 5. **Place devices with internal positions.** Convert human U positions to Rackula internal units where `position = U * 6`; U1 is the bottom of the rack.
-6. **Apply physical architecture rules.** Heavy gear low, UPS/batteries at the bottom, switches near cabling, KVM consoles at ergonomic height, explicit blanks for unused rack units when producing a complete diagram.
+6. **Apply physical architecture rules.** Heavy gear low, UPS/batteries at the bottom, switches near cabling, KVM consoles at ergonomic height, and intentional reserved space where needed.
 7. **Validate before final output.** Prefer the bundled `scripts/validate-rackula.js` validator when Bun is available, then check schema shape, positions, fit, collisions, `face`, device type references, colors, enum values, and port references.
 8. **Package when requested.** If the user wants an importable artifact, run the bundled `scripts/zip-yaml.js` script from this skill, then report both YAML and ZIP paths.
 
@@ -37,7 +37,7 @@ Follow this sequence for Rackula work:
 
 | User task | Read these files |
 |-----------|------------------|
-| New basic layout | `references/schema.md`, `references/position-system.md`, `references/device-types.md` |
+| New basic layout | `references/schema.md`, `references/enums.md`, `references/position-system.md`, `references/device-types.md` |
 | Existing YAML edit | `references/schema.md`, then preserve unknown fields in the target file |
 | Rack placement/architecture | `references/rack-layout-architecture.md` |
 | Homelab or small rack | `examples/homelab-small.rackula.yaml`, `examples/homelab-router-switch.rackula.yaml` |
@@ -57,7 +57,8 @@ Follow this sequence for Rackula work:
 - Use internal positions: U1 = `position: 6`, U25 = `position: 150`, U42 = `position: 252`.
 - Do not use `position: 0` for rack-level devices; `0` is valid only for container children.
 - Use `face: both` for full-depth rack-mounted servers, storage, UPS, firewalls, and other rear-visible devices. Use `face: front` for front-only/passive items like patch panels or front-only blanks.
-- Fill unused rack units with explicit blank devices when creating a complete diagram; blank device types use `category: blank` and a gray `#RRGGBB` color, preferably `#44475A`.
+- Do not fill every empty rack unit with blank devices by default. Use `category: blank` only for intentional physical panels, reserved expansion, future equipment space, or documented placeholders. Leave ordinary unused space empty when it does not communicate a specific reservation.
+- Use only enum values from `references/enums.md` for categories, airflow, faces, rack form factors, slot settings, widths, and interface types. If no exact category exists, use `other` rather than inventing values like `security` or `management`.
 - Use `#RRGGBB` colors only.
 - Do not use `management` as an interface type; use `1000base-t`, `10gbase-x-sfpp`, `console`, `virtual`, or `other` as appropriate.
 - Quote `device_bays[].position` values if working with legacy device bays.
@@ -98,10 +99,10 @@ When creating a `.rackula.yaml` file:
 1. Choose a filename under `input/` if this workspace provides an `input/` folder; otherwise use the user-requested path.
 2. Add `metadata.id`, `metadata.name`, `version`, `name`, `racks`, `device_types`, and `settings`.
 3. Define racks with `height`, `width`, `form_factor`, `starting_unit`, `position`, and `devices`.
-4. Define all device types with valid `u_height`, `slot_width`, `colour`, `category`, depth, airflow, interfaces, and power ports when relevant.
+4. Define all device types with valid enum-backed `category`, `airflow`, `slot_width`, `colour`, depth, interfaces, and power ports when relevant.
 5. Convert all human U positions to internal positions.
 6. Check every device fits: `position + (u_height * 6) - 1 <= rack.height * 6`.
-7. Add blanks or reserved panels for unused spaces when producing a complete visual diagram.
+7. Add blank or reserved devices only for intentionally reserved/future/physical blank-panel space; do not auto-fill all empty U space for visual completeness.
 8. Validate that all `connections` use `a_port_id`/`b_port_id` and that both referenced port IDs exist on placed devices.
 
 ## Edit-Existing-Layout Checklist
@@ -197,6 +198,7 @@ The validator checks:
 - Required top-level structure: `version`, `name`, `racks`, `device_types`, `settings`
 - Modern `racks` array instead of legacy `rack`
 - Device type references and duplicate slugs
+- Enum values for device categories, airflow, rack form factors, rack widths, faces, slots, and interface types
 - Rack device positions, fit, and collisions
 - Rack-level `position: 0` misuse
 - Port ID uniqueness

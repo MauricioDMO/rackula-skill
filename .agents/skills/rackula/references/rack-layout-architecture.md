@@ -44,7 +44,7 @@ Place heavy equipment low to keep the rack stable and serviceable:
 Preferred bottom-to-top order:
 
 ```text
-Battery banks -> UPS/power modules -> heavy storage -> blade/dense compute -> standard servers -> light appliances -> patching/cable management/network gear -> blanks/reserved space
+Battery banks -> UPS/power modules -> heavy storage -> blade/dense compute -> standard servers -> light appliances -> patching/cable management/network gear -> intentional reserved space
 ```
 
 Do not place UPS units or battery banks high in the rack unless there is explicit engineering justification, rack anchoring, manufacturer approval, and load calculation. When in doubt, move heavier equipment lower.
@@ -69,7 +69,7 @@ Bottom: battery banks, external battery modules, heaviest UPS modules
 Lower/middle: UPS main units, power modules
 Middle: ATS, bypass units, power distribution modules
 Upper/middle: energy monitoring, network management cards, lightweight controls
-Top: cable management, blanking panels, future expansion
+Top: cable management and intentional future expansion
 ```
 
 ## Cooling And Airflow
@@ -87,10 +87,10 @@ Avoid these thermal failures:
 
 - Switch intake facing hot aisle or exhaust blowing into cold aisle.
 - Mixed airflow devices without ducting or containment.
-- Empty rack gaps without blanking panels.
+- Large unexplained empty rack gaps in layouts that claim reserved capacity or airflow control.
 - Cable bundles blocking exhaust.
 
-All unused rack spaces should be explicit gray blanking-panel devices unless intentionally reserved and documented. Use `category: blank`, preferably `colour: "#44475A"`.
+Do not auto-fill every unused U with a blank device. Use explicit gray blanking-panel devices only for physical panels, reserved expansion, future equipment space, or other documented placeholders. Use `category: blank`, preferably `colour: "#44475A"`.
 
 Full-depth rack devices such as servers, storage, UPS, and firewalls should use `face: both` so the rear view is populated. Use `face: front` only for truly front-only/passive items such as patch panels or front-only blanks.
 
@@ -163,7 +163,7 @@ Group equipment by function, but do not create false high availability. Redundan
 
 ## Blank Spaces And Expansion
 
-Production diagrams should not leave open empty U space. Represent unused units with explicit blank or reserved devices so airflow and expansion intent are visible.
+Production diagrams may leave ordinary unused U space empty. Represent space with explicit blank or reserved devices only when it communicates a real physical panel, reserved capacity, future equipment, cable-management clearance, or airflow containment intent.
 
 Blank device type example:
 
@@ -176,7 +176,7 @@ Blank device type example:
   category: blank
 ```
 
-Unused space labels may be: blanking panel, reserved expansion, future server space, cable management, or airflow containment.
+Reserved space labels may be: blanking panel, reserved expansion, future server space, cable management, or airflow containment.
 
 ## Validation Checklist
 
@@ -189,7 +189,7 @@ Before finalizing a rack diagram, confirm:
 [ ] Single-power dependencies are labeled or mitigated.
 [ ] PDUs are logical, preferably rear/side 0U.
 [ ] Airflow model is clear; switch intake/exhaust orientation is valid.
-[ ] Empty rack units are explicit gray blanks or documented reserved space.
+[ ] Intentional reserved spaces use explicit gray blanks/placeholders; ordinary unused U space is not auto-filled.
 [ ] Full-depth devices use face: both when rear rendering is required.
 [ ] Patch panels and ToR switches follow the cable entry path.
 [ ] Power, data, fiber, and OOB paths are separated and managed.
@@ -221,7 +221,7 @@ WARNING: UPS is placed too high. Move to lower rack units.
 WARNING: KVM console is too low/high for comfortable human access.
 WARNING: Switch airflow direction is unknown. Verify fan module orientation.
 WARNING: Redundant devices share the same physical failure domain.
-WARNING: Empty rack spaces should use blanking panels.
+WARNING: Reserved or airflow-critical empty rack spaces should be documented with blanking panels/placeholders.
 WARNING: Full-depth devices should use face: both when rear rendering is required.
 ```
 
@@ -235,7 +235,7 @@ If it generates heat -> preserve the correct airflow path.
 If it is redundant -> avoid shared failure domains.
 If airflow, cable entry, or power topology is unknown -> state the assumption or warn; do not claim correctness.
 If it is full-depth -> use face: both unless truly front-only.
-If a rack unit is unused -> add a gray category: blank device or document reserved use.
+If a rack unit is intentionally reserved or physically blanked -> add a gray `category: blank` device; otherwise leave ordinary unused space empty.
 ```
 
 ## Bad Patterns To Avoid
@@ -245,7 +245,7 @@ If a rack unit is unused -> add a gray category: blank device or document reserv
 - ToR switches far from cable entry without justification.
 - Patch panels far from cable entry.
 - HA/core primary and secondary sharing all dependencies while labeled highly available.
-- Open empty rack units or whitespace instead of explicit gray blanks.
+- Explicit gray blanks used as automatic filler with no reserved, physical, or documentation purpose.
 - Full-depth servers, storage, UPS, or firewalls using `face: front` and disappearing from rear view.
 - Power and data cables mixed without organization.
 - Switches installed against required airflow direction.

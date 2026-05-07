@@ -6976,6 +6976,52 @@ var $visitAsync = visit.visitAsync;
 
 // src/validate-rackula.ts
 var hexColor = /^#[0-9A-Fa-f]{6}$/;
+var deviceCategories = new Set([
+  "server",
+  "network",
+  "patch-panel",
+  "power",
+  "storage",
+  "kvm",
+  "av-media",
+  "cooling",
+  "shelf",
+  "blank",
+  "cable-management",
+  "chassis",
+  "other"
+]);
+var formFactors = new Set(["2-post", "4-post", "4-post-cabinet", "wall-mount", "open-frame"]);
+var airflowValues = new Set(["passive", "front-to-rear", "rear-to-front", "left-to-right", "right-to-left", "side-to-rear", "mixed"]);
+var faceValues = new Set(["front", "rear", "both"]);
+var slotPositions = new Set(["left", "right", "full"]);
+var slotWidths = new Set([1, 2]);
+var rackWidths = new Set([10, 19, 21, 23]);
+var interfaceTypes = new Set([
+  "100base-tx",
+  "1000base-t",
+  "2.5gbase-t",
+  "5gbase-t",
+  "10gbase-t",
+  "1000base-x-sfp",
+  "10gbase-x-sfpp",
+  "25gbase-x-sfp28",
+  "40gbase-x-qsfpp",
+  "100gbase-x-qsfp28",
+  "100gbase-x-qsfpdd",
+  "200gbase-x-qsfp56",
+  "200gbase-x-qsfpdd",
+  "400gbase-x-qsfpdd",
+  "console",
+  "usb-a",
+  "usb-b",
+  "usb-c",
+  "usb-mini-b",
+  "usb-micro-b",
+  "virtual",
+  "lag",
+  "other"
+]);
 var { values } = parseArgs({
   options: {
     file: { type: "string", short: "f" },
@@ -7009,6 +7055,19 @@ async function listFiles(input) {
 function asArray(value) {
   return Array.isArray(value) ? value : [];
 }
+function allowedValues(values2) {
+  return Array.from(values2).join(", ");
+}
+function validateEnum(errors2, label, value, values2, required = false) {
+  if (value === undefined || value === null || value === "") {
+    if (required)
+      errors2.push(`${label}: missing value`);
+    return;
+  }
+  if (!values2.has(value)) {
+    errors2.push(`${label}: invalid value ${String(value)} (allowed: ${allowedValues(values2)})`);
+  }
+}
 function validateLayout(doc, file) {
   const errors2 = [];
   const racks = asArray(doc?.racks);
@@ -7041,12 +7100,20 @@ function validateLayout(doc, file) {
       errors2.push(`${type.slug}: u_height must be >= 0.5`);
     if (type.colour && !hexColor.test(type.colour))
       errors2.push(`${type.slug}: colour must be #RRGGBB`);
+    validateEnum(errors2, `${type.slug}: category`, type.category, deviceCategories, true);
+    validateEnum(errors2, `${type.slug}: airflow`, type.airflow, airflowValues);
+    validateEnum(errors2, `${type.slug}: slot_width`, type.slot_width, slotWidths);
+    for (const iface of asArray(type?.interfaces)) {
+      validateEnum(errors2, `${type.slug}: interface ${iface?.name ?? iface?.id ?? "unnamed"} type`, iface?.type, interfaceTypes, true);
+    }
   }
   for (const rack of racks) {
     if (!rack?.id)
       errors2.push("rack missing id");
     if (!Array.isArray(rack?.devices))
       errors2.push(`${rack?.id ?? "rack"}: missing devices array`);
+    validateEnum(errors2, `${rack?.id ?? "rack"}: width`, rack?.width, rackWidths);
+    validateEnum(errors2, `${rack?.id ?? "rack"}: form_factor`, rack?.form_factor, formFactors);
     const occupied = [];
     const rackUnits = Number(rack?.height) * 6;
     for (const device of asArray(rack?.devices)) {
@@ -7063,6 +7130,8 @@ function validateLayout(doc, file) {
         errors2.push(`${deviceId}: missing face`);
       if (device?.position === 0 && !isContainerChild)
         errors2.push(`${deviceId}: rack-level device uses position 0`);
+      validateEnum(errors2, `${deviceId}: face`, device?.face, faceValues);
+      validateEnum(errors2, `${deviceId}: slot_position`, device?.slot_position, slotPositions);
       for (const port of asArray(device?.ports)) {
         if (!port?.id)
           errors2.push(`${deviceId}: port missing id`);
@@ -7070,6 +7139,7 @@ function validateLayout(doc, file) {
           errors2.push(`${deviceId}: duplicate port id ${port.id}`);
         else
           portIds.add(port.id);
+        validateEnum(errors2, `${deviceId}: port ${port?.id ?? "unnamed"} type`, port?.type, interfaceTypes, true);
       }
       if (type && typeof device?.position === "number" && !isContainerChild) {
         const end = device.position + type.u_height * 6 - 1;

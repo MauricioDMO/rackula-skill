@@ -98,12 +98,27 @@
     },
     {
       "id": 7,
+      "prompt": "Create a new Rackula layout with a firewall/security appliance, console server, and KVM console. Use valid Rackula category enums and do not fill every unused rack unit with blank panels unless the space is explicitly reserved.",
+      "expected_output": "Valid Rackula YAML that uses enum-backed categories and intentional blanks only",
+      "files": [],
+      "expectations": [
+        "Loads references/enums.md when creating a new layout",
+        "Does not invent device category values such as security or management",
+        "Uses category other when no precise category enum exists",
+        "Uses category kvm for KVM consoles",
+        "Does not auto-fill ordinary unused U space with blank devices",
+        "Uses category blank only for physical blank panels, reserved expansion, future equipment, or documented placeholders"
+      ]
+    },
+    {
+      "id": 8,
       "prompt": "Package the rackula YAML files in ./input into importable Rackula ZIP files in ./output. Assume the rackula skill is installed but the original development repo is not cloned, so package.json scripts may not exist.",
       "expected_output": "Uses the bundled skill script directly with Bun first and Node as fallback",
       "files": [],
       "expectations": [
         "Uses .agents/skills/rackula/scripts/zip-yaml.js directly",
         "Uses .agents/skills/rackula/scripts/validate-rackula.js for structural validation",
+        "Bundled validator rejects invalid device category enums before import",
         "Can run the bundled validator with node because its YAML parser is included in the generated script",
         "Does not use ad hoc Node snippets requiring the yaml package in the user workspace",
         "Tries bun run before node when Bun is available",

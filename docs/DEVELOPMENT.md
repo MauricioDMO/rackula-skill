@@ -18,7 +18,7 @@ src/
 | Module         | Purpose                                                           |
 | -------------- | ----------------------------------------------------------------- |
 | `zip-yaml.ts`         | Argument parsing via `parseArgs`, dispatches to `runner.ts`       |
-| `validate-rackula.ts` | Structural validation for Rackula YAML using Bun's YAML parser    |
+| `validate-rackula.ts` | Structural validation for Rackula YAML using the bundled `yaml` parser |
 | `runner.ts`           | Routes to text/file/directory handlers, orchestrates ZIP creation |
 | `zipper.ts`           | Pure ZIP assembly: CRC32 checksum, ZIP format structure           |
 | `extractor.ts`        | Regex-based YAML frontmatter extraction                           |

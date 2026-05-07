@@ -152,7 +152,7 @@ bun run .agents/skills/rackula/scripts/validate-rackula.js --help
 node .agents/skills/rackula/scripts/validate-rackula.js --help
 ```
 
-The validator checks required top-level fields, device type references, rack fit, collisions, rack-level `position: 0`, duplicate port IDs, `connections` with `a_port_id`/`b_port_id`, referenced port IDs, and connection colors.
+The validator checks required top-level fields, enum values such as `device_types[].category`, device type references, rack fit, collisions, rack-level `position: 0`, duplicate port IDs, `connections` with `a_port_id`/`b_port_id`, referenced port IDs, and connection colors.
 
 Do not use `node -e 'require("yaml")...'`; the user's workspace may not have that package. Use the bundled validator instead.
 
